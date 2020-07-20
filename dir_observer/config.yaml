@@ -1,0 +1,17 @@
+watchers:
+    - dir: "path"
+      regex: "a:pcap"
+      reporter: "a:default"
+
+    - dir: "path"
+      regex: "^archived_.*\\.(?:pcapng|pcap|cap)$"
+      reporter: 
+        url: "http://smthing"
+
+aliases:
+    reporters:
+      - alias: "default"
+        url: "http://smthing"
+    regexes:
+       - alias: "pcap"
+         regex: "^archived_.*\\.(?:pcapng|pcap|cap)$"
