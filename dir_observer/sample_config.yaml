@@ -1,3 +1,5 @@
+id: auto
+
 watchers:
     - dir: "path"
       regex: "a:pcap"

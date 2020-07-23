@@ -23,7 +23,7 @@ class Processor():
         self.__url = url
 
     def __str__(self):
-        return f"Processor#<{self.url}>"
+        return f"Processor#<{self.__url}>"
     
     def report(self, filePath):
         filePath = Path(filePath).absolute()
