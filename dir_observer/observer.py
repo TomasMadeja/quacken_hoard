@@ -55,7 +55,7 @@ class DirEventHandler(FileSystemEventHandler):
             isinstance(event, FileCreatedEvent) and 
             self.path_matches(event.src_path)
         ):
-            self.__processor.report(event.dst_path)
+            self.__processor.report(event.src_path)
 
     def on_moved(self, event):
         if event.is_directory:
