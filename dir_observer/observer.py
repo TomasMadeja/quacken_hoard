@@ -173,6 +173,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
     logger.debug("Parsing config")
     dir_watcher = parse_config(args.config)
     logger.debug("Running")
