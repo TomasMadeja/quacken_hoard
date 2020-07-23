@@ -31,9 +31,9 @@ class Processor():
             r = requests.post(
                 self.__url, 
                 files={
-                    filePath.name : f
+                    "cap" : f
                 },
-                json={"id": NODEID}
+                data={"id": NODEID}
             ) 
 
 
