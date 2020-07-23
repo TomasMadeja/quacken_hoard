@@ -9,7 +9,7 @@ import argparse
 from pathlib import Path
 
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileMovedEvent
+from watchdog.events import FileSystemEventHandler, FileMovedEvent, FileCreatedEvent
 
 import yaml
 
@@ -44,11 +44,23 @@ class DirEventHandler(FileSystemEventHandler):
         self.__regex: re.Pattern = regex
         self.__processor = processor
 
-    def on_moved(self, event):
-        logger.debug(f"on moved event {event.src_path} {event.dst_path}")
-        self.process(event)
+    def on_any_event(self, event):
+        logger.debug(f"any event {event} {type(event)}")
 
-    def process(self, event):
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        logger.debug(f"on moved event {event.src_path}")
+        if (
+            isinstance(event, FileCreatedEvent) and 
+            self.path_matches(event.src_path)
+        ):
+            self.__processor.report(event.dst_path)
+
+    def on_moved(self, event):
+        if event.is_directory:
+            return
+        logger.debug(f"on moved event {event.src_path} {event.dst_path}")
         if (
             isinstance(event, FileMovedEvent) and 
             self.path_matches(event.dst_path)
