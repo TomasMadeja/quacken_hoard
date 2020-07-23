@@ -1,3 +1,7 @@
+  
+import logging
+logger = logging.getLogger(__name__)
+
 import sys
 import time
 import re
@@ -17,6 +21,9 @@ NODEID = None
 class Processor():
     def __init__(self, url):
         self.__url = url
+
+    def __str__(self):
+        return f"Processor#<{self.url}>"
     
     def report(self, filePath):
         filePath = Path(filePath).absolute()
@@ -38,6 +45,7 @@ class DirEventHandler(FileSystemEventHandler):
         self.__processor = processor
 
     def on_moved(self, event):
+        logger.debug("on moved event {event.src_path} {event.dst_path}")
         self.process(event)
 
     def process(self, event):
@@ -62,6 +70,7 @@ class DirWatcher:
         self.__registered_events.append((path, handler))
 
     def run(self):
+        logger.debug("run-start")
         self.start()
         try:
             while True:
@@ -70,6 +79,7 @@ class DirWatcher:
             self.stop()
 
     def start(self):
+        logger.debug("start-start")
         self.__schedule()
         self.__event_observer.start()
 
@@ -78,12 +88,15 @@ class DirWatcher:
         self.__event_observer.join()
 
     def __schedule(self):
+        logger.debug("scheaduling")
         for (path, handler) in self.__registered_events:
+            logger.debug("scheaduling {path} {handler}")
             self.__event_observer.schedule(
                 handler,
                 str(path),
                 recursive=True
             )
+        logger.debug("done scheaduling")
 
 EXAMPLE = """
 watchers:
@@ -111,7 +124,7 @@ def parse_yaml(config: Path) -> dict:
     return parsed_data
 
 def parse_config(config_path: Path):
-    watcher = DirWatcher()
+    dir_watcher = DirWatcher()
     config = parse_yaml(config_path)
 
     nodeID = config["id"]
@@ -126,7 +139,7 @@ def parse_config(config_path: Path):
         regex_aliases[record["alias"]] = re.compile(record["regex"])
 
     reporter_aliases = {}
-    for record in config["aliases"]["watchers"]:
+    for record in config["aliases"]["reporters"]:
         reporter_aliases[record["alias"]] = Processor(record["url"])
     
     for watcher in config["watchers"]:
@@ -135,16 +148,19 @@ def parse_config(config_path: Path):
             regex = regex_aliases[regex_raw[2:]]
         else:
             regex = re.compile(regex_raw)
-        reporter_raw = watchers["reporter"]
+        reporter_raw = watcher["reporter"]
         if isinstance(reporter_raw, str):
-            reporter = reporter_aliases[reporter_raw]
+            reporter = reporter_aliases[reporter_raw[2:]]
         else:
             reporter = Processor(reporter_raw["url"])
+
+        logger.debug(f"Adding watcher {watcher['dir'] {regex} {reporter}}")
         
-        watcher.add(
+        dir_watcher.add(
             Path(watcher['dir']).absolute(),
             DirEventHandler(regex, reporter)
         )
+    return dir_watcher
 
 
 if __name__ == "__main__":
@@ -157,5 +173,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    logger.debug("Parsing config")
     dir_watcher = parse_config(args.config)
+    logger.debug("Running")
     dir_watcher.run()
