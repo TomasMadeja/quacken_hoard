@@ -89,3 +89,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Elixir
+
+/collector/elixir/collector/_build
+
