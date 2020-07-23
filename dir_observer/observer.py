@@ -45,7 +45,7 @@ class DirEventHandler(FileSystemEventHandler):
         self.__processor = processor
 
     def on_moved(self, event):
-        logger.debug("on moved event {event.src_path} {event.dst_path}")
+        logger.debug(f"on moved event {event.src_path} {event.dst_path}")
         self.process(event)
 
     def process(self, event):
@@ -90,7 +90,7 @@ class DirWatcher:
     def __schedule(self):
         logger.debug("scheaduling")
         for (path, handler) in self.__registered_events:
-            logger.debug("scheaduling {path} {handler}")
+            logger.debug(f"scheaduling {path} {handler}")
             self.__event_observer.schedule(
                 handler,
                 str(path),
