@@ -11,6 +11,8 @@ import yaml
 
 import requests
 
+NODEID = None
+
 
 class Processor():
     def __init__(self, url):
@@ -23,7 +25,8 @@ class Processor():
                 self.__url, 
                 files={
                     filePath.name : f
-                }
+                },
+                json={"id": NODEID}
             ) 
 
 
@@ -110,6 +113,13 @@ def parse_yaml(config: Path) -> dict:
 def parse_config(config_path: Path):
     watcher = DirWatcher()
     config = parse_yaml(config_path)
+
+    nodeID = config["id"]
+    if nodeID == "auto":
+        from uuid import uuid4
+        nodeID = str(uuid4())
+    global NODEID
+    NODEID = nodeID
 
     regex_aliases = {}
     for record in config["aliases"]["regexes"]:
