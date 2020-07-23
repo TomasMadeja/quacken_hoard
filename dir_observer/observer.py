@@ -154,7 +154,7 @@ def parse_config(config_path: Path):
         else:
             reporter = Processor(reporter_raw["url"])
 
-        logger.debug(f"Adding watcher {watcher['dir'] {regex} {reporter}}")
+        logger.debug(f"Adding watcher {watcher['dir']} {regex} {reporter}")
         
         dir_watcher.add(
             Path(watcher['dir']).absolute(),
